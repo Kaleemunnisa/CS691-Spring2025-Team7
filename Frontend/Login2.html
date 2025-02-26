@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 350px;
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .button {
+            width: 100%;
+            padding: 12px;
+            background: #007BFF;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .switch {
+            margin-top: 10px;
+        }
+        .switch a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .error-message {
+            color: red;
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        let users = JSON.parse(localStorage.getItem("users")) || {};
+
+        function login(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const errorMessage = document.getElementById("error-message");
+            
+            if (users[username] && users[username] === password) {
+                localStorage.setItem("loggedInUser", username);
+                window.location.href = 'welcome.html';
+            } else {
+                errorMessage.style.display = "block";
+            }
+        }
+
+        function register() {
+            const username = prompt("Enter a new username:");
+            const password = prompt("Enter a new password:");
+            if (username && password) {
+                users[username] = password;
+                localStorage.setItem("users", JSON.stringify(users));
+                alert("Registration successful! You can now log in.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>LUMINA</h2>
+        <form onsubmit="login(event)">
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="button">Login</button>
+            <p id="error-message" class="error-message">Incorrect username or password</p>
+        </form>
+        <div class="switch">
+            <p>New user? <a href="#" onclick="register()">Join Now</a></p>
+        </div>
+    </div>
+</body>
+</html>
+
