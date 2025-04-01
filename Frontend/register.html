@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .register-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h2>User Registration</h2>
+        <input type="Email" id="newEmail" placeholder="Enter Email" required>
+        <input type="text" id="newUsername" placeholder="Enter Username" required>
+        <input type="password" id="newPassword" placeholder="Enter Password" required>
+        <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+        <button onclick="registerUser()">Register</button>
+        <p>Already have an account? <a href="Lumina login.html">Login here</a></p>
+    </div>
+
+    <script>
+        function registerUser() {
+            const newEmail=document.getElementById("newEmail").value;
+            const newUsername = document.getElementById("newUsername").value;
+            const newPassword = document.getElementById("newPassword").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            if(!newUsername || !newEmail || !newPassword || !confirmPassword){
+                alert("Please fill in all fields.");
+                return;
+            }
+            if(newPassword !==confirmPassword){
+                alert("Passwords do not match.Please try again.");
+                return;
+            }
+
+                localStorage.setItem("email", newEmail);
+localStorage.setItem("username", newUsername);
+localStorage.setItem("password", newPassword);
+
+                alert("Registration successful! Please check your email for confirmation and then log in. ");
+                
+                
+        
+            
+            fetch('/send-confirmation',{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({email:newEmail,username:newUsername})
+            }).then(response =>{
+                if(response.ok){
+                    alert('Confirmation email sent!');
+                }else{
+                    alert('Error sending confirmation email.')
+                }
+                    window.location.href = "Lumina login.html";
+                }).catch(error => {
+                    console.error('Error:',error);
+                    alert('An error occurred.Please try again later.');
+                });
+
+
+                
+        }
+    </script>
+   <script src="registration.js"></script>
+</body>
+</html>

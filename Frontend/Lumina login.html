@@ -38,6 +38,19 @@
         button:hover {
             background: #0056b3;
         }
+        .forgot-password{
+            text-align:center;
+            margin-top:1rem;
+        }
+        .forgot-password a{
+            color:#FF00FF;
+            text-decoration:none;
+            
+        }
+        .forgot-password a:hover
+        {
+            text-decoration:underline;
+        }
     </style>
 </head>
 <body>
@@ -48,7 +61,13 @@
         <input type="password" id="password" placeholder="Enter Password" required>
         <button onclick="loginUser()">Login</button>
         <p id="error-msg" style="color:red; display:none;">Invalid username or password!</p>
-        <p>Don't have an account? <a href="file:///C:/Users/DELL/Desktop/registration.html">Register here</a></p>
+    
+
+        <div class="forgot-password">
+            <a href="#">Forgot Password?</a>
+      
+        <p>Don't have an account? <a href="register.html">Register here</a></p>
+    </div>
     </div>
 
     <script>
@@ -58,14 +77,20 @@
 
             const storedUsername = localStorage.getItem("username");
             const storedPassword = localStorage.getItem("password");
+            console.log("Stored Username:", storedUsername);
+            console.log("Stored Password:", storedPassword);
+            console.log("Entered Username:", username);
+            console.log("Entered Password:", password);
 
             if (username === storedUsername && password === storedPassword) {
                 alert("Login successful!");
-                window.location.href = "file:///C:/Users/DELL/Desktop/wepage.html#"; // Redirect after login
+                window.location.href = "wepage.html"; // Redirect after login
             } else {
                 document.getElementById("error-msg").style.display = "block";
             }
         }
     </script>
+    <script src="login.js"></script>
+
 </body>
 </html>
