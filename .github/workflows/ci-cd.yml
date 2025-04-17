@@ -1,53 +1,58 @@
-name: CI/CD Pipeline
-- name: Install Dependencies
-  run: npm install
-  working-directory: Backend
-
-- name: Run Tests
-  run: npm test || echo "Tests failed, continuing..."
-  working-directory: Backend
-
-- name: Build Project
-  run: npm run build || echo "Skipping build"
-  working-directory: Backend
-
-on:
-  push:
-    branches:
-      - main  # Runs CI/CD when changes are pushed to main
-  pull_request:
-    branches:
-      - main  # Runs CI/CD when a pull request is created
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install Dependencies
-        run: npm install  # Removed 'working-directory' because package.json is in the root
-
-      - name: Run Tests
-        run: npm test || echo "Tests failed, continuing..."  # Keep it in root
-
-      - name: Build Project
-        run: npm run build || echo "Skipping build"  # Keep it in root
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Deploy to Vercel
-        run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }}  # Make sure to set the VERCEL_TOKEN
+{
+  "name": "CI/CD Pipeline",
+  "on": {
+    "push": {
+      "branches": ["main"]
+    },
+    "pull_request": {
+      "branches": ["main"]
+    }
+  },
+  "jobs": {
+    "build": {
+      "runs-on": "ubuntu-latest",
+      "steps": [
+        {
+          "name": "Checkout Repository",
+          "uses": "actions/checkout@v3"
+        },
+        {
+          "name": "Set up Node.js",
+          "uses": "actions/setup-node@v3",
+          "with": {
+            "node-version": "18"
+          }
+        },
+        {
+          "name": "Install Dependencies",
+          "run": "npm install",
+          "working-directory": "Backend"
+        },
+        {
+          "name": "Run Tests",
+          "run": "npm test || echo \"Tests failed, continuing...\"",
+          "working-directory": "Backend"
+        },
+        {
+          "name": "Build Project",
+          "run": "npm run build || echo \"Skipping build\"",
+          "working-directory": "Backend"
+        }
+      ]
+    },
+    "deploy": {
+      "needs": "build",
+      "runs-on": "ubuntu-latest",
+      "steps": [
+        {
+          "name": "Checkout Repository",
+          "uses": "actions/checkout@v3"
+        },
+        {
+          "name": "Deploy to Vercel",
+          "run": "vercel --prod --token=${{ secrets.VERCEL_TOKEN }}"
+        }
+      ]
+    }
+  }
+}
