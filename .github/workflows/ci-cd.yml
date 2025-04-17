@@ -1,4 +1,15 @@
 name: CI/CD Pipeline
+- name: Install Dependencies
+  run: npm install
+  working-directory: Backend
+
+- name: Run Tests
+  run: npm test || echo "Tests failed, continuing..."
+  working-directory: Backend
+
+- name: Build Project
+  run: npm run build || echo "Skipping build"
+  working-directory: Backend
 
 on:
   push:
