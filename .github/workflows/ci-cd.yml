@@ -40,18 +40,18 @@
         }
       ]
     },
-    "deploy": {
-      "needs": "build",
-      "runs-on": "ubuntu-latest",
-      "steps": [
-        {
-          "name": "Checkout Repository",
-          "uses": "actions/checkout@v3"
-        },
-        {
-          "name": "Install Vercel CLI",
-          "run": "npm install -g vercel"
-        },
+    deploy:
+  needs: build
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Vercel CLI
+      run: npm install -g vercel
+
+    - name: Deploy to Vercel
+      run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
         {
           "name": "Deploy to Vercel",
           "run": "vercel --prod --token=${{ secrets.VERCEL_TOKEN }}"
