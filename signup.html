@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sign Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS for beauty & animation -->
+    <style>
+      :root {
+        --primary-color: #007bff;
+        --hover-color: #0056b3;
+        --bg-gradient: linear-gradient(to right, #ffecd2, #fcb69f);
+        --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      body {
+        background: var(--bg-gradient);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        animation: fadeIn 1s ease-in;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+      }
+
+      .card {
+        animation: slideUp 0.8s ease-out;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        background-color: #fff;
+        transition: all 0.3s ease;
+        border: none;
+        overflow: hidden;
+      }
+
+      .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      .card-body {
+        padding: 2.5rem;
+      }
+
+      .card-title {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 1.5rem;
+        animation: slideDown 0.5s ease-out;
+      }
+
+      .form-label {
+        font-weight: 600;
+        color: #555;
+        font-size: 0.9rem;
+      }
+
+      .form-control {
+        border-radius: 10px;
+        padding: 12px;
+        border: 1px solid #ddd;
+        transition: all 0.3s ease;
+        animation: slideRight 0.5s ease-out;
+      }
+
+      .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+
+      .btn-primary {
+        border-radius: 10px;
+        background-color: var(--primary-color);
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 6px rgba(0, 123, 255, 0.2);
+        transition: all 0.3s ease;
+        animation: slideUp 0.6s ease-out;
+      }
+
+      .btn-primary:hover {
+        background-color: var(--hover-color);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 123, 255, 0.3);
+      }
+
+      .btn-primary:active {
+        transform: translateY(0);
+      }
+
+      a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        animation: fadeIn 1s ease-out;
+      }
+
+      a:hover {
+        color: var(--hover-color);
+        text-decoration: underline;
+      }
+
+      .input-container {
+        position: relative;
+      }
+
+      .input-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+        z-index: 10;
+        pointer-events: none;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideRight {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .mb-3 {
+        animation: fadeIn 0.5s ease-out;
+        animation-fill-mode: both;
+      }
+
+      .mb-3:nth-child(1) {
+        animation-delay: 0.2s;
+      }
+
+      .mb-3:nth-child(2) {
+        animation-delay: 0.4s;
+      }
+
+      .d-grid {
+        animation: fadeIn 0.5s ease-out;
+        animation-delay: 0.6s;
+        animation-fill-mode: both;
+      }
+
+      .mt-3 {
+        animation: fadeIn 0.5s ease-out;
+        animation-delay: 0.8s;
+        animation-fill-mode: both;
+      }
+
+      /* Pulse animation for sign-up button */
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+        }
+      }
+
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card mx-auto" style="max-width: 400px">
+        <div class="card-body">
+          <h4 class="card-title text-center">Create an Account</h4>
+          <form method="POST" action="/signup">
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <div class="input-container">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  name="username"
+                  required
+                />
+                <svg
+                  class="input-icon"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-container">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  name="password"
+                  required
+                />
+                <svg
+                  class="input-icon"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary pulse">
+                Sign Up
+              </button>
+            </div>
+            <div class="mt-3 text-center">
+              <a href="/signin">Already have an account? Sign In</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Remove pulse effect after first interaction
+      document
+        .querySelector(".pulse")
+        .addEventListener("mouseover", function () {
+          this.classList.remove("pulse");
+        });
+
+      // Add input focus animations
+      const inputs = document.querySelectorAll(".form-control");
+      inputs.forEach((input) => {
+        input.addEventListener("focus", function () {
+          this.parentElement.style.transform = "scale(1.02)";
+          this.parentElement.style.transition = "all 0.3s ease";
+        });
+
+        input.addEventListener("blur", function () {
+          this.parentElement.style.transform = "scale(1)";
+        });
+      });
+    </script>
+  </body>
+</html>

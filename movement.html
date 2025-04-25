@@ -1,0 +1,145 @@
+<!-- movement.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Movement & Mood - LUMINA</title>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #f0f4c3, #ffffff);
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0px 8px 20px rgba(0,0,0,0.1);
+      animation: slideIn 1s ease-in-out;
+    }
+
+    h1 {
+      text-align: center;
+      color: #43a047;
+      font-size: 2.8em;
+      margin-bottom: 10px;
+    }
+
+    p.subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 1.1em;
+      margin-bottom: 30px;
+    }
+
+    .tip {
+      background: #e8f5e9;
+      border-left: 5px solid #43a047;
+      margin: 20px 0;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .tip h3 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+
+    .tip p {
+      margin-bottom: 0;
+    }
+
+    .button {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 12px 24px;
+      background: #43a047;
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .button:hover {
+      background: #2e7d32;
+    }
+
+    .dark-mode {
+      background: #121212 !important;
+      color: #f0f0f0 !important;
+    }
+
+    .dark-mode .container {
+      background: #1e1e1e;
+      box-shadow: none;
+    }
+
+    .dark-mode a.button {
+      background: #bb86fc;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <button onclick="toggleDarkMode()" style="position:fixed; top:20px; left:20px; z-index:999; padding:8px 12px; background:#555; color:white; border:none; border-radius:8px;">🌙 Toggle Dark Mode</button>
+
+  <div class="container">
+    <h1>🏃‍♀️ Movement & Mood</h1>
+    <p class="subtitle">Discover how physical activity can enhance your mental well-being and mood.</p>
+
+    <div class="tip" data-aos="fade-up"><h3>🌞 Start with Light Activity</h3><p>A short walk, gentle yoga, or stretching can help release endorphins.</p></div>
+    <div class="tip" data-aos="fade-up" data-aos-delay="100"><h3>⏰ Stay Consistent</h3><p>Even 10–20 minutes a day of movement can make a difference.</p></div>
+    <div class="tip" data-aos="fade-up" data-aos-delay="200"><h3>🌿 Connect with Nature</h3><p>Exercising outdoors helps reduce anxiety and stress.</p></div>
+    <div class="tip" data-aos="fade-up" data-aos-delay="300"><h3>🧘‍♂️ Mindful Movement</h3><p>Try activities like tai chi or dancing. Focus on your breath and body.</p></div>
+    <div class="tip" data-aos="fade-up" data-aos-delay="400"><h3>👯 Move Together</h3><p>Working out with others boosts motivation and social connection.</p></div>
+
+    <div style="text-align:center; margin-top:40px;">
+      <p style="font-size:1.2em; color:#555;">Need a moment?</p>
+      <div id="bubble" style="margin:auto; width:120px; height:120px; border-radius:50%; background:#c8e6c9; transition:all 2s ease;"></div>
+      <p id="breath-text" style="margin-top:10px;">Breathe in...</p>
+    </div>
+
+    <a href="/" class="button">← Back to Home</a>
+  </div>
+
+  <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="position:fixed; bottom:20px; right:20px; background:#43a047; color:white; border:none; border-radius:50%; width:50px; height:50px; font-size:24px;">↑</button>
+
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>AOS.init();</script>
+  <script>
+    const bubble = document.getElementById('bubble');
+    const breathText = document.getElementById('breath-text');
+    let isExpanded = false;
+    setInterval(() => {
+      isExpanded = !isExpanded;
+      bubble.style.transform = isExpanded ? 'scale(1.5)' : 'scale(1)';
+      breathText.innerText = isExpanded ? 'Breathe out...' : 'Breathe in...';
+    }, 4000);
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    window.onload = () => {
+      setTimeout(() => {
+        alert('🌟 Affirmation: You are enough, exactly as you are.');
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

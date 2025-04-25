@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Your Progress - LUMINA</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      color: #2e3a46;
+    }
+
+    header {
+      background-color: #6a8e9b;
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    main {
+      padding: 3rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .card h2 {
+      margin-bottom: 1rem;
+      color: #6a8e9b;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: 300px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: #6a8e9b;
+      color: white;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Track Your Progress</h1>
+  </header>
+  <main>
+    <p>This page displays visual insights about your mental wellness journey.</p>
+
+    <div class="card">
+      <h2>Mood Over Time</h2>
+      <canvas id="moodChart"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Completed Sessions</h2>
+      <canvas id="sessionChart"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Survey Summary</h2>
+      <canvas id="surveyChart"></canvas>
+    </div>
+  </main>
+  <footer>
+    <p>© 2025 LUMINA Mental Health. Your data is private and safe.</p>
+  </footer>
+
+  <script>
+    const moodCtx = document.getElementById('moodChart').getContext('2d');
+    new Chart(moodCtx, {
+      type: 'line',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+        datasets: [{
+          label: 'Mood Score',
+          data: [3, 4, 5, 4, 6],
+          fill: true,
+          backgroundColor: 'rgba(106, 142, 155, 0.2)',
+          borderColor: '#6a8e9b',
+          tension: 0.4
+        }]
+      }
+    });
+
+    const sessionCtx = document.getElementById('sessionChart').getContext('2d');
+    new Chart(sessionCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Week 1', 'Week 2', 'Week 3'],
+        datasets: [{
+          label: 'Completed Sessions',
+          data: [2, 3, 4],
+          backgroundColor: '#a0c4cc'
+        }]
+      }
+    });
+
+    const surveyCtx = document.getElementById('surveyChart').getContext('2d');
+    new Chart(surveyCtx, {
+      type: 'radar',
+      data: {
+        labels: ['Sleep', 'Energy', 'Mood', 'Focus', 'Stress'],
+        datasets: [{
+          label: 'Self Report Score',
+          data: [3, 4, 2, 5, 3],
+          backgroundColor: 'rgba(106, 142, 155, 0.3)',
+          borderColor: '#6a8e9b',
+          borderWidth: 2
+        }]
+      }
+    });
+  </script>
+</body>
+</html>
