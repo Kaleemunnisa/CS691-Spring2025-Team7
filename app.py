@@ -2,13 +2,19 @@
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 from litellm import completion  # type: ignore
 import os
+from dotenv import load_dotenv
+load_dotenv()
+import openai
+openai.api_key = os.getenv("OPENAI_API_KEY")
 import re
 import sqlite3
 import torch
+import random
+import json
 import torch.nn.functional as F
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.contrib.github import make_github_blueprint, github
-from dotenv import load_dotenv
+
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session, g
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSequenceClassification
 from huggingface_hub import login
@@ -91,6 +97,14 @@ def get_db():
         db = g._database = sqlite3.connect(DATABASE)
         db.row_factory = sqlite3.Row
     return db
+def save_progress(user, mood, session_completed, sleep, energy, focus, stress):
+    db = get_db()
+    db.execute('''
+        INSERT INTO progress (user, mood, session_completed, sleep, energy, focus, stress)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (user, mood, session_completed, sleep, energy, focus, stress))
+    db.commit()
+
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -108,17 +122,31 @@ def init_db():
                 password TEXT NOT NULL
             );
         ''')
+        db.execute('''
+            CREATE TABLE IF NOT EXISTS progress (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user TEXT NOT NULL,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                mood INTEGER,
+                session_completed INTEGER,
+                sleep INTEGER,
+                energy INTEGER,
+                focus INTEGER,
+                stress INTEGER
+            );
+        ''')
         db.commit()
+
 
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        username = request.form['username']
+        email = request.form['email']
         password = generate_password_hash(request.form['password'])
         try:
             db = get_db()
-            db.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
+            db.execute('INSERT INTO users (username, password) VALUES (?, ?)', (email, password))
             db.commit()
             return redirect(url_for('signin'))
         except sqlite3.IntegrityError:
@@ -160,7 +188,18 @@ def github_login():
     username = resp.json().get("login")
     session["user"] = username
     return redirect(url_for("home"))
-
+@app.route('/forgot', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        db = get_db()
+        user = db.execute('SELECT * FROM users WHERE username = ?', (email,)).fetchone()
+        if user:
+            # Simulate sending reset email
+            return render_template('forgot.html', message="✅ Reset link has been sent to your email.")
+        else:
+            return render_template('forgot.html', message="❌ Email not found. Please check and try again.")
+    return render_template('forgot.html')
 
 
 @app.route('/signout')
@@ -180,6 +219,30 @@ def progress():
         return redirect(url_for('signin'))
     return render_template('progress.html')
 
+@app.route('/api/progress')
+def get_progress():
+    if 'user' not in session:
+        return jsonify({"error": "Not authorized"}), 403
+
+    db = get_db()
+    rows = db.execute('SELECT * FROM progress WHERE user = ? ORDER BY timestamp ASC', (session['user'],)).fetchall()
+
+    data = {
+        "mood": [row["mood"] for row in rows],
+        "session": [row["session_completed"] for row in rows],
+        "labels": [row["timestamp"][:10] for row in rows],
+        "survey": {
+            "sleep": rows[-1]["sleep"],
+            "energy": rows[-1]["energy"],
+            "mood": rows[-1]["mood"],
+            "focus": rows[-1]["focus"],
+            "stress": rows[-1]["stress"],
+        } if rows else {}
+    }
+    return jsonify(data)
+
+
+
 @app.route('/Mindfulness')
 def mindfulness_page():
     if 'user' not in session:
@@ -197,6 +260,32 @@ def sleep():
 @app.route('/movement')
 def movement():
     return render_template('movement.html')  
+
+@app.route('/supportzone')
+def supportzone():
+    return render_template('supportzone.html')
+
+@app.route('/memory')
+def memory():
+    return render_template('memory.html')
+
+@app.route('/doodle')
+def doodle():
+    return render_template('doodle.html')
+
+@app.route('/quiz')
+def quiz():
+    return render_template('quiz.html')
+
+@app.route('/slider')
+def puzzle():
+    return render_template('slider.html')
+
+@app.route('/supportive')
+def supportive():
+    return render_template('supportive.html')
+
+
 
 
 @app.route('/chat', methods=['POST'])
@@ -218,6 +307,7 @@ def chat():
     state = conversation_state[user_id]
     step = state["step"]
     mode = state.get("mode", "survey")
+
 
     # Optional Survey Skip
     if user_message in ["skip", "skip survey", "i want to talk", "support"]:
@@ -252,6 +342,17 @@ def chat():
                     state["survey_done"] = True
                     state["mode"] = "support"
                     state["depression_label"] = label
+                    # Save survey data as progress
+                    save_progress(
+                        user=user_id,
+                        mood=state["responses"].get("mood", 3),
+                        session_completed=1,
+                        sleep=state["responses"].get("sleep", 3),
+                        energy=state["responses"].get("low energy", 3),
+                        focus=state["responses"].get("concentration", 3),
+                        stress=state["responses"].get("stress", 3),
+                    )
+
                     state["history"] = ""
                     return jsonify({
                         "response": f"✅ Survey complete! You are likely experiencing **{label}** depression (Confidence: {conf:.2%}, Model: {model_used}).\n\nYou can now talk to me freely — I'm here to support you 💬"
@@ -327,6 +428,45 @@ def generate_depression_prediction_ensemble(prompt: str):
     label_gpt, conf_gpt = generate_depression_prediction_gpt2(prompt)
     label_bert, conf_bert = generate_depression_prediction_bert(prompt)
     return (label_bert, conf_bert, "BERT") if conf_bert >= conf_gpt else (label_gpt, conf_gpt, "GPT-2")
+
+# === AI Quiz Endpoint ===
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+@app.route("/get-question")
+def get_question():
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": (
+                "Generate a short, positive, reflective question that promotes mental wellness, "
+                "along with 4 uplifting answer choices. Respond ONLY in this JSON format:\n"
+                '{ "question": "Your question here", "answers": ["A", "B", "C", "D"] }'
+            )}],
+            temperature=0.8
+        )
+
+        content = response.choices[0].message.content.strip()
+        print("GPT Response:", content)
+
+        import re, json
+        match = re.search(r'\{[\s\S]+\}', content)
+        if match:
+            data = json.loads(match.group(0))
+            return jsonify(data)
+
+        raise ValueError("Response not JSON-formatted")
+
+    except Exception as e:
+        print("❌ OpenAI error or JSON parsing failed:", str(e))
+        return jsonify({
+            "question": "What brings you calm today?",
+            "answers": ["A deep breath", "A quiet moment", "A kind thought", "A nature walk"]
+        })
+
+
+
 
 if __name__ == '__main__':
     init_db()
