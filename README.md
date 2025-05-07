@@ -1,21 +1,21 @@
-# 🌟 LUMINA – AI-Assisted Mental Health Support Platform
+#  LUMINA – AI-Assisted Mental Health Support Platform
 
 LUMINA is a real-time, AI-assisted mental health support platform that provides safe, anonymous, and stigma-free emotional support. Powered by GPT-4, it enables users to chat or talk with trained volunteers, while AI models flag high-risk content for immediate action.
 
 ---
 
-## 🧠 Key Features
+##  Key Features
 
-- 💬 Real-time GPT-4 powered chatbot
-- 🎤 WebRTC voice support
-- 🔐 Google and GitHub OAuth login
-- 📈 Chart.js-based progress dashboard
-- 💾 SQLite support (PostgreSQL optional)
-- 🧠 Message classification with GPT-4
+-  Real-time GPT-4 powered chatbot
+-  WebRTC voice support
+-  Google and GitHub OAuth login
+-  Chart.js-based progress dashboard
+-  SQLite support (PostgreSQL optional)
+-  Message classification with GPT-4
 
 ---
 
-## ⚙️ Tech Stack
+##  Tech Stack
 
 | Component    | Technology          |
 |--------------|---------------------|
@@ -29,7 +29,7 @@ LUMINA is a real-time, AI-assisted mental health support platform that provides 
 
 ---
 
-## 🛠 Setup Instructions
+##  Setup Instructions
 
 ### 1. Clone the Repository
 ```bash
@@ -69,7 +69,7 @@ flask run
 
 ---
 
-## 🔄 Realtime Server (Optional)
+##  Realtime Server (Optional)
 ```bash
 cd realtime-server
 npm install
@@ -78,12 +78,12 @@ node server.js
 
 ---
 
-## 📃 License
+##  License
 MIT License
 
 ---
 
-## 👨‍💻 Contributors
+##  Contributors
 - Pavan Ganeshreddy Yeruva
 - Snehanjani Pati
 - Sravya Vemireddy
