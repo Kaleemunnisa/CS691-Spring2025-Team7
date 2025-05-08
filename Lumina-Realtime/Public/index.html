@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LUMINA Live Chat & Call</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #messages { height: 200px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; }
+    #localAudio, #remoteAudio { display: block; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>🗨️ Chat</h2>
+  <div id="messages"></div>
+  <input id="msg" placeholder="Type message..." />
+  <button onclick="sendMsg()">Send</button>
+
+  <h2>📞 Voice Call</h2>
+  <button onclick="startCall()">Start Call</button>
+  <audio id="localAudio" autoplay muted></audio>
+  <audio id="remoteAudio" autoplay></audio>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
