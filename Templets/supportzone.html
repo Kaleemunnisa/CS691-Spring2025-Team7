@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Support Zone – LUMINA</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #f1f8e9);
+      color: #333;
+    }
+
+    header {
+      background-color: #80cbc4;
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+      border-bottom-left-radius: 30px;
+      border-bottom-right-radius: 30px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 36px;
+    }
+
+    .section {
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+    }
+
+    .game-card {
+      border-radius: 16px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+      background: #fff;
+      color: #333;
+      text-align: center;
+    }
+
+    .game-card:hover {
+      transform: scale(1.04);
+    }
+
+    .game-image {
+      height: 160px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .game-info {
+      padding: 16px;
+    }
+
+    .game-info h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .game-info p {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .circle-breathe {
+      width: 100px;
+      height: 100px;
+      background-color: #b2ebf2;
+      border-radius: 50%;
+      margin: 20px auto;
+      animation: breathe 6s infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.4); }
+    }
+
+    footer {
+      text-align: center;
+      font-size: 14px;
+      padding: 20px;
+      color: #666;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      position: relative;
+      background: #fff;
+      margin: 2% auto;
+      padding: 10px;
+      width: 95%;
+      max-width: 1200px;
+      border-radius: 15px;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-content iframe {
+      width: 100%;
+      height: 700px;
+      border: none;
+      border-radius: 10px;
+      background: white;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 28px;
+      color: #666;
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      color: #000;
+    }
+/* Chat Widget Styles */
+#chatWidget {
+  display: none;
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 320px;
+  height: 400px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  
+  flex-direction: column;
+  z-index: 1002;
+}
+
+#chatWidget .header {
+  background-color: #80cbc4;
+  padding: 12px;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+}
+
+#chatMessages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  background: #f7f7f7;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#chatMessages div {
+  max-width: 85%;
+  word-wrap: break-word;
+}
+
+#chatMessages .user {
+  background: #c8e6c9;
+  align-self: flex-end;
+  border-radius: 10px;
+  padding: 8px;
+  line-height: 1.4;
+}
+
+#chatMessages .bot {
+  background: #f0f4f8;
+  align-self: flex-start;
+  border-radius: 10px;
+  padding: 8px;
+  line-height: 1.4;
+}
+
+
+#chatInput {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-top: 1px solid #eee;
+}
+
+#sendBtn {
+  padding: 10px;
+  background-color: #80cbc4;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Welcome to the Support Zone 🌿</h1>
+  <p>Relax, breathe, and enjoy some peaceful moments while waiting or calming down.</p>
+</header>
+
+<section class="section" style="text-align:center;">
+  <h2>Breathe With Us</h2>
+  <div class="circle-breathe"></div>
+  <p>Inhale... and exhale... Let the calm in.</p>
+</section>
+
+<section class="section">
+  <h2>Try These Calming Mini-Games 🎮</h2>
+  <div class="game-grid">
+
+    <div class="game-card" onclick="openGame('/memory', 'https://i.postimg.cc/7hkBKPtb/t1.jpg')">
+      <div class="game-image" style="background-image: url('https://i.postimg.cc/7hkBKPtb/t1.jpg');"></div>
+      <div class="game-info">
+        <h3>Memory Match</h3>
+        <p>Flip cards and find matching pairs.</p>
+      </div>
+    </div>
+
+    <div class="game-card" onclick="openGame('/doodle', 'https://i.postimg.cc/gjHgQ91s/g2.jpg')">
+      <div class="game-image" style="background-image: url('https://i.postimg.cc/gjHgQ91s/g2.jpg');"></div>
+      <div class="game-info">
+        <h3>Zen Doodle</h3>
+        <p>Draw or color freely with a calming palette.</p>
+      </div>
+    </div>
+
+    <div class="game-card" onclick="openGame('/quiz', 'https://i.postimg.cc/dQ2NLdDC/g3.webp')">
+      <div class="game-image" style="background-image: url('https://i.postimg.cc/dQ2NLdDC/g3.webp');"></div>
+      <div class="game-info">
+        <h3>Positive Quiz</h3>
+        <p>Answer uplifting questions and boost your mindset.</p>
+      </div>
+    </div>
+
+    <div class="game-card" onclick="openGame('slider', 'https://i.postimg.cc/HnkMYfVB/g4.png')">
+      <div class="game-image" style="background-image: url('https://i.postimg.cc/HnkMYfVB/g4.png');"></div>
+      <div class="game-info">
+        <h3>Slider Puzzle</h3>
+        <p>Rearrange tiles to complete peaceful images.</p>
+      </div>
+    </div>
+<!-- Chat Box Button -->
+<div id="chatToggle" onclick="toggleChat()" style="
+  position: fixed; bottom: 20px; right: 20px;
+  background-color: #80cbc4; color: white;
+  border-radius: 50%; width: 60px; height: 60px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+">💬</div>
+
+<!-- Chat Widget -->
+<div id="chatWidget">
+  <div class="header">Chat with Health Agent</div>
+  <div id="chatMessages"></div>
+  <div style="display: flex;">
+    <input id="chatInput" type="text" placeholder="Type a message..." />
+    <button id="sendBtn" onclick="sendMessage()" aria-label="Send message">Send</button>
+
+  </div>
+</div>
+
+
+<!-- Call Button -->
+<div style="position: fixed; bottom: 90px; left: 20px;">
+  <button onclick="startCall()" style="
+    background-color: #ff7043; color: white;
+    padding: 14px 20px; border: none;
+    border-radius: 8px; font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  ">📞 Call Agent</button>
+</div>
+
+
+  </div>
+</section>
+
+<!-- Modal -->
+<div id="gameModal" class="modal">
+  <div class="modal-content" id="gameModalContent">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <iframe id="gameFrame" src=""></iframe>
+  </div>
+</div>
+
+<footer>
+  © 2025 LUMINA Mental Health. All rights reserved.
+</footer>
+
+<script>
+  function openGame(gameUrl, backgroundUrl) {
+    document.getElementById("gameFrame").src = gameUrl;
+    document.getElementById("gameModalContent").style.backgroundImage = `url('${backgroundUrl}')`;
+    document.getElementById("gameModal").style.display = "block";
+  }
+
+  function closeModal() {
+    document.getElementById("gameModal").style.display = "none";
+    document.getElementById("gameFrame").src = "";
+    document.getElementById("gameModalContent").style.backgroundImage = "none";
+  }
+
+  function toggleChat() {
+    const chat = document.getElementById("chatWidget");
+    chat.style.display = chat.style.display === "none" ? "flex" : "none";
+  }
+
+  function sendMessage() {
+    const input = document.getElementById("chatInput");
+    const messages = document.getElementById("chatMessages");
+    const msg = input.value.trim();
+
+    if (msg) {
+      // User message bubble
+      const userBubble = document.createElement("div");
+      userBubble.style.padding = "8px";
+      userBubble.style.marginBottom = "6px";
+      userBubble.classList.add("user");
+      userBubble.style.borderRadius = "10px";
+      userBubble.style.alignSelf = "flex-end";
+      userBubble.innerText = msg;
+      messages.appendChild(userBubble);
+      input.value = "";
+      messages.scrollTop = messages.scrollHeight;
+
+      // Simulated GPT-style response
+      setTimeout(() => {
+        const botBubble = document.createElement("div");
+        botBubble.style.padding = "8px";
+        botBubble.style.marginBottom = "6px";
+        botBubble.classList.add("bot");
+        botBubble.style.borderRadius = "10px";
+        botBubble.style.alignSelf = "flex-start";
+        botBubble.innerText = getPlaceholderResponse();
+        messages.appendChild(botBubble);
+        messages.scrollTop = messages.scrollHeight;
+      }, 1000);
+    }
+  }
+
+  function getPlaceholderResponse() {
+    const responses = [
+      "Please hold on, a professional will join you shortly. 🧑‍⚕️",
+      "You're not alone — a support agent will be with you soon. 💬",
+      "We appreciate your patience. Help is on the way. ⏳",
+      "Thanks for reaching out. Someone will connect with you shortly. 💙",
+      "Take a deep breath. We're getting someone to assist you. 🌿"
+    ];
+    return responses[Math.floor(Math.random() * responses.length)];
+  }
+
+  function startCall() {
+    alert("📞 Call feature coming soon! Integrate WebRTC or Twilio here.");
+  }
+
+  window.onclick = function(event) {
+    const modal = document.getElementById("gameModal");
+    if (event.target === modal) {
+      closeModal();
+    }
+  };
+
+  // ✅ Add ENTER key support for chat input
+  window.onload = function () {
+    const input = document.getElementById("chatInput");
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault(); // prevent form submission or newline
+        sendMessage();
+      }
+    });
+  };
+</script>
+
+
+<audio id="localAudio" autoplay muted style="display: none;"></audio>
+<audio id="remoteAudio" autoplay style="display: none;"></audio>
+
+<script src="http://localhost:3000/socket.io/socket.io.js"></script>
+<script src="http://localhost:3000/script.js"></script>
+</body>
+</html>
+

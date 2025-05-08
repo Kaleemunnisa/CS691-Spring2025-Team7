@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Journal | LUMINA</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f0f4f8;
+    margin: 0;
+    padding: 0;
+    color: #2e3a46;
+  }
+
+  .journal-container {
+    max-width: 700px;
+    margin: 100px auto 60px;
+    padding: 40px 50px;
+    background: #ffffff;
+    padding-top: 80px;
+    border-radius: 16px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  h2 {
+    margin-bottom: 25px;
+    font-size: 2rem;
+    color: #3d5a80;
+    text-align: center;
+  }
+
+  label {
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 130px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    padding: 14px;
+    font-size: 1rem;
+    resize: vertical;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  }
+
+  .mood-select {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  .mood-select input[type="radio"] {
+    display: none;
+  }
+
+  .mood-select label {
+    font-size: 2.2rem;
+    margin: 0 12px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    display: inline-block;
+  }
+
+  .mood-select label:hover {
+    transform: scale(1.4);
+  }
+
+  .mood-select input[type="radio"]:checked + label {
+    transform: scale(1.6);
+    text-shadow: 0 0 6px #6a8e9b;
+  }
+
+  .btn-submit {
+    display: block;
+    margin: 0 auto 30px;
+    padding: 12px 30px;
+    background: #6a8e9b;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+
+  .btn-submit:hover {
+    background: #527480;
+    transform: translateY(-2px);
+  }
+
+  .reflections {
+    margin-top: 30px;
+  }
+
+  .reflections h3 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: #3d5a80;
+  }
+
+  .reflection-entry {
+    background: #f8fafd;
+    padding: 16px 20px;
+    margin-bottom: 15px;
+    border-left: 5px solid #6a8e9b;
+    border-radius: 12px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.03);
+  }
+
+  .reflection-entry strong {
+    color: #3d5a80;
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  @media (max-width: 600px) {
+    .journal-container {
+      margin: 80px 20px;
+      padding: 30px;
+    }
+
+    .mood-select label {
+      font-size: 1.8rem;
+      margin: 0 8px;
+    }
+
+    .btn-submit {
+      width: 100%;
+    }
+  }
+</style>
+
+
+</head>
+<body>
+  <header style="background:#6a8e9b; padding:20px; color:white; font-size:1.5rem; text-align:center; font-weight:500; letter-spacing:1px;">
+  <img src="/static/logo.png" alt="LUMINA Logo" style="height:40px; vertical-align:middle; margin-right:10px;">
+  LUMINA Journal
+</header>
+
+<div class="journal-container">
+  <h2>Today's Reflection</h2>
+  <form method="POST">
+    <label for="text">How are you feeling today?</label>
+    <textarea id="text" name="text" required></textarea>
+
+    <div class="mood-select">
+      <label>Select your mood:</label><br>
+      <input type="radio" id="happy" name="mood" value="😊" required />
+      <label for="happy">😊</label>
+
+      <input type="radio" id="neutral" name="mood" value="😐" />
+      <label for="neutral">😐</label>
+
+      <input type="radio" id="worried" name="mood" value="😟" />
+      <label for="worried">😟</label>
+
+      <input type="radio" id="angry" name="mood" value="😠" />
+      <label for="angry">😠</label>
+    </div>
+
+    <button type="submit" class="btn-submit">Save Entry</button>
+  </form>
+
+  <div class="reflections">
+    <h3>Previous Reflections</h3>
+    {% for journal in journal %}
+      <div class="reflection-entry">
+        <strong>{{ journal.date }} — Mood: {{ journal.mood }}</strong>
+        {{ journal.text }}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+<script>
+  if (window.location.hash === "#saved") {
+    document.querySelector(".reflections").scrollIntoView({ behavior: "smooth" });
+  }
+</script>
+
+
+</body>
+</html>
