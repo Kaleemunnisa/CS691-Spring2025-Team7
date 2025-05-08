@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI-Powered Positive Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f1f8e9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #388e3c;
+    }
+
+    .quiz-box {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    #question {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .options button {
+      background-color: #aed581;
+      border: none;
+      border-radius: 8px;
+      margin: 10px 0;
+      padding: 12px 20px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .options button:hover {
+      background-color: #9ccc65;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #33691e;
+    }
+
+    #nextBtn {
+      margin-top: 20px;
+      background: #66bb6a;
+      color: white;
+      padding: 10px 18px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+
+    #nextBtn:hover {
+      background: #43a047;
+    }
+  </style>
+</head>
+<body>
+
+<h2>AI-Powered Positive Quiz ✨</h2>
+
+<div class="quiz-box">
+  <div id="question">Loading question...</div>
+  <div id="options" class="options"></div>
+  <div id="result" style="display:none;"></div>
+  <button id="nextBtn" onclick="loadQuestion()">Next Question</button>
+</div>
+
+<script>
+  let autoLoadInterval;
+
+  async function loadQuestion() {
+    try {
+      const res = await fetch("/get-question");
+      const data = await res.json();
+
+      if (!data.question || !Array.isArray(data.answers)) {
+        throw new Error("Invalid format from server");
+      }
+
+      document.getElementById("question").innerText = data.question;
+      document.getElementById("options").innerHTML = "";
+      document.getElementById("result").style.display = "none";
+      document.getElementById("nextBtn").style.display = "none";
+
+      data.answers.forEach(ans => {
+        const btn = document.createElement("button");
+        btn.textContent = ans;
+        btn.onclick = () => {
+          document.getElementById("result").innerText = `✨ You chose: "${ans}" – Beautiful choice! ✨`;
+          document.getElementById("result").style.display = "block";
+          document.getElementById("nextBtn").style.display = "inline-block";
+          clearInterval(autoLoadInterval);
+        };
+        document.getElementById("options").appendChild(btn);
+      });
+
+    } catch (err) {
+      console.error("Quiz Load Error:", err);
+      document.getElementById("question").innerText = "Failed to load question.";
+    }
+  }
+
+  window.onload = () => {
+    loadQuestion();
+    autoLoadInterval = setInterval(loadQuestion, 15000);
+  };
+</script>
+
+</body>
+</html>

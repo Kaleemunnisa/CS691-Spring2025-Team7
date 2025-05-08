@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Level Slider Puzzle</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #e0f7fa;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #00796b;
+    }
+
+    #game-board {
+      margin: 20px auto;
+      display: grid;
+      gap: 2px;
+      background: #b2ebf2;
+      border-radius: 10px;
+      width: 500px;
+      height: 500px;
+    }
+
+    .tile {
+      background-size: 500px 500px;
+      background-repeat: no-repeat;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .empty {
+      background: none;
+      cursor: default;
+    }
+
+    #timer {
+      font-size: 20px;
+      margin: 10px;
+      color: #d32f2f;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px 24px;
+      font-size: 18px;
+      background: #00796b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #004d40;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🧉 Multi-Level Slider Puzzle</h2>
+  <div id="timer"></div>
+  <div id="game-board"></div>
+  <button onclick="nextLevel()">Skip to Next Level</button>
+
+  <script>
+    const levels = [
+      [
+        "https://i.postimg.cc/VLWJBY7z/l11.jpg",
+        "https://i.postimg.cc/FH8XDN9Q/l13.jpg",
+        "https://i.postimg.cc/63LsWZC9/l12.jpg",
+        "https://i.postimg.cc/SRyBJKGc/l14.jpg"
+      ],
+      [
+        "https://i.postimg.cc/d3pjgHDD/l21.png",
+        "https://i.postimg.cc/vHxz5sSn/l22.avif",
+        "https://i.postimg.cc/K4hgndR7/l33.webp",
+        "https://i.postimg.cc/GmJ5VDnr/l24.avif"
+      ],
+      [
+        "https://i.postimg.cc/MTct6MNn/l31.webp",
+        "https://i.postimg.cc/rmvjKy2Q/l32.jpg",
+        "https://i.postimg.cc/Y2W8TFQV/Bumblebee-Transformer-Wallpapers-on-Wallpaper-Safari.jpg",
+        "https://i.postimg.cc/vH7hZdqt/l34.jpg"
+      ]
+    ];
+
+    let level = 0;
+    let imageIndex = 0;
+    let size = 3;
+    let countdown;
+    let tiles = [];
+    let grid = [];
+    const board = document.getElementById("game-board");
+    const timerDisplay = document.getElementById("timer");
+
+    function createBoard(size, imageUrl) {
+      board.innerHTML = "";
+      board.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+      board.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+
+      tiles = [];
+      for (let i = 0; i < size * size; i++) tiles.push(i);
+      tiles = shuffle(tiles);
+
+      grid = [];
+      for (let row = 0; row < size; row++) {
+        grid[row] = [];
+        for (let col = 0; col < size; col++) {
+          grid[row][col] = tiles[row * size + col];
+        }
+      }
+
+      renderGrid(imageUrl);
+    }
+
+    function renderGrid(imageUrl) {
+      board.innerHTML = "";
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          const index = grid[row][col];
+          const tile = document.createElement("div");
+          tile.className = "tile";
+          if (index === size * size - 1) {
+            tile.classList.add("empty");
+          } else {
+            const x = (index % size) * (500 / size);
+            const y = Math.floor(index / size) * (500 / size);
+            tile.style.backgroundImage = `url('${imageUrl}')`;
+            tile.style.backgroundPosition = `-${x}px -${y}px`;
+          }
+          tile.onclick = () => handleClick(row, col, imageUrl);
+          board.appendChild(tile);
+        }
+      }
+    }
+
+    function handleClick(row, col, imageUrl) {
+      const moves = [
+        [row - 1, col], [row + 1, col],
+        [row, col - 1], [row, col + 1]
+      ];
+      for (const [r, c] of moves) {
+        if (r >= 0 && r < size && c >= 0 && c < size) {
+          if (grid[r][c] === size * size - 1) {
+            [grid[row][col], grid[r][c]] = [grid[r][c], grid[row][col]];
+            renderGrid(imageUrl);
+            return;
+          }
+        }
+      }
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function startTimer() {
+      let baseTime = 90 + (level * 20);
+      let time = baseTime;
+      timerDisplay.textContent = `⏳ Time Left: ${time}s`;
+      clearInterval(countdown);
+      countdown = setInterval(() => {
+        time--;
+        timerDisplay.textContent = `⏳ Time Left: ${time}s`;
+        if (time <= 0) {
+          clearInterval(countdown);
+          nextImage();
+        }
+      }, 1000);
+    }
+
+    function nextImage() {
+      imageIndex++;
+      if (imageIndex >= levels[level].length) {
+        nextLevel();
+      } else {
+        loadCurrent();
+      }
+    }
+
+    function nextLevel() {
+      level++;
+      imageIndex = 0;
+      if (level >= levels.length) {
+        board.innerHTML = "<h3>✨ You’ve completed all levels!</h3>";
+        timerDisplay.textContent = "";
+      } else {
+        size = 3 + level;
+        loadCurrent();
+      }
+    }
+
+    function loadCurrent() {
+      size = 3 + level;
+      createBoard(size, levels[level][imageIndex]);
+      startTimer();
+    }
+
+    loadCurrent();
+  </script>
+</body>
+</html>
