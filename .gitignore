@@ -1,23 +1,4 @@
-# Ignore environment files
 .env
-
-# Ignore Python cache
 __pycache__/
 *.pyc
-
-# Ignore local database
-*.db
 users.db
-
-# Ignore OS and IDE-specific files
-.DS_Store
-*.log
-.vscode/
-.idea/
-
-# Ignore node modules (if using Node.js)
-node_modules/
-
-# Ignore virtual environments
-venv/
-.env/
