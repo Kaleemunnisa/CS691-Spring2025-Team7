@@ -1,4 +1,4 @@
-﻿import os
+import os
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 from litellm import completion  # type: ignore
 import os
@@ -59,21 +59,26 @@ SYMPTOMS = [
     "panic attacks", "hopelessness", "restlessness", "low energy"
 ]
 
+from flask import Flask, session
+
 app = Flask(__name__)
 
-# === Load environment variables ===
+# ✅ Load environment variables
 load_dotenv()
 
+# ✅ Set config options
+app.secret_key = os.getenv("SECRET_KEY") or 'dev-secret'
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # ✅ allow session cookies
+app.config['SESSION_COOKIE_SECURE'] = False     # ✅ safe for local development (set to True for HTTPS)
+
+# ✅ Load tokens from .env
 HF_TOKEN = os.getenv("HF_TOKEN")
 LITELLM_API_KEY = os.getenv("LITELLM_API_KEY")
 
-app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")  # ✅ Use secure secret from .env
-
+# ✅ Your database and app state
 DATABASE = 'users.db'
 conversation_state = {}
-app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")  # ✅ already correct
+
 # === Register Google OAuth ===
 google_bp = make_google_blueprint(
     client_id=os.getenv("GOOGLE_CLIENT_ID"),
@@ -135,6 +140,17 @@ def init_db():
                 stress INTEGER
             );
         ''')
+        db.execute('''
+        CREATE TABLE IF NOT EXISTS journal (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            mood TEXT NOT NULL,
+            text TEXT NOT NULL
+        );
+    ''')
+
+
         db.commit()
 
 
@@ -156,16 +172,40 @@ def signup():
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        db = get_db()
-        user = db.execute('SELECT * FROM users WHERE username = ?', (email,)).fetchone()
-        if user and check_password_hash(user['password'], password):
-            session['user'] = email
-            return redirect(url_for('home'))
+        # Handle AJAX (fetch) login
+        if request.is_json:
+            data = request.get_json(force=True)
+            email = data.get('email')
+            password = data.get('password')
+
+            db = get_db()
+            user = db.execute('SELECT * FROM users WHERE username = ?', (email,)).fetchone()
+
+            if user and check_password_hash(user['password'], password):
+                session.permanent = True
+                session['user'] = email
+                return jsonify({"success": True})
+            else:
+                return jsonify({"success": False, "error": "❌ Invalid email or password."})
+
+        # Handle fallback traditional POST (if needed)
         else:
-            return "Invalid email or password."
+            email = request.form.get('email')
+            password = request.form.get('password')
+            db = get_db()
+            user = db.execute('SELECT * FROM users WHERE username = ?', (email,)).fetchone()
+
+            if user and check_password_hash(user['password'], password):
+                session.permanent = True
+                session['user'] = email
+                return redirect(url_for('home'))
+            else:
+                return render_template("signin.html", error="❌ Invalid email or password.")
+
     return render_template('signin.html')
+
+
+
 
 @app.route("/google_login")
 def google_login():
@@ -218,6 +258,11 @@ def progress():
     if 'user' not in session:
         return redirect(url_for('signin'))
     return render_template('progress.html')
+
+@app.route('/debug-session')
+def debug_session():
+    return jsonify(session_user=session.get("user", "NOT SET"))
+
 
 @app.route('/api/progress')
 def get_progress():
@@ -281,11 +326,23 @@ def quiz():
 def puzzle():
     return render_template('slider.html')
 
-@app.route('/supportive')
+@app.route('/supportive', methods=['GET', 'POST'])
 def supportive():
-    return render_template('supportive.html')
+    if 'user' not in session:
+        return redirect(url_for('signin'))
 
+    db = get_db()
+    if request.method == 'POST':
+        text = request.form['text']
+        mood = request.form['mood']
+        db.execute('INSERT INTO journals (user, date, mood, text) VALUES (?, date("now"), ?, ?)', 
+                   (session['user'], mood, text))
+        db.commit()
+        return redirect(url_for('supportive'))
 
+    rows = db.execute('SELECT date, mood, text FROM journals WHERE user = ? ORDER BY id DESC', 
+                      (session['user'],)).fetchall()
+    return render_template('supportive.html', journals=rows)
 
 
 @app.route('/chat', methods=['POST'])
@@ -308,8 +365,16 @@ def chat():
     step = state["step"]
     mode = state.get("mode", "survey")
 
+    # 🔁 Restart the survey manually
+    if user_message in ["survey", "start survey", "begin survey"]:
+        state["mode"] = "survey"
+        state["step"] = 0
+        state["responses"] = {}
+        return jsonify({
+            "response": f"Let's begin! How often do you experience {SYMPTOMS[0]}? (1 to 6)\nType 'skip' if you'd prefer to talk directly."
+        })
 
-    # Optional Survey Skip
+    # ⏩ Skip to support mode
     if user_message in ["skip", "skip survey", "i want to talk", "support"]:
         state["mode"] = "support"
         state["survey_done"] = False
@@ -317,6 +382,7 @@ def chat():
         state["history"] = ""
         return jsonify({"response": "🧠 Survey skipped. You can now talk to me freely — I'm here to support you 💬"})
 
+    # 🧠 Survey logic
     if mode == "survey":
         if step == 0 and not user_message.isdigit():
             return jsonify({
@@ -336,13 +402,17 @@ def chat():
                     next_symptom = SYMPTOMS[state["step"]]
                     return jsonify({"response": f"How often do you experience {next_symptom}? (1 to 6)"})
                 else:
+                    # Survey completed
                     symptom_str = "; ".join([f"{k}={v}" for k, v in state["responses"].items()])
                     prompt = f"Input Symptoms: {symptom_str}; Prediction: Depression State ="
                     label, conf, model_used = generate_depression_prediction_ensemble(prompt)
                     state["survey_done"] = True
                     state["mode"] = "support"
                     state["depression_label"] = label
-                    # Save survey data as progress
+                    state["history"] = ""
+
+                    # Save survey data
+                if user_id:
                     save_progress(
                         user=user_id,
                         mood=state["responses"].get("mood", 3),
@@ -351,15 +421,18 @@ def chat():
                         energy=state["responses"].get("low energy", 3),
                         focus=state["responses"].get("concentration", 3),
                         stress=state["responses"].get("stress", 3),
-                    )
+        )
+                else:
+                    print("⚠️ No user ID found in session during save_progress()")
 
-                    state["history"] = ""
-                    return jsonify({
-                        "response": f"✅ Survey complete! You are likely experiencing **{label}** depression (Confidence: {conf:.2%}, Model: {model_used}).\n\nYou can now talk to me freely — I'm here to support you 💬"
-                    })
+                return jsonify({
+                    "response": f"✅ Survey complete! You are likely experiencing **{label}** depression (Confidence: {conf:.2%}, Model: {model_used}).\n\nYou can now talk to me freely — I'm here to support you 💬"
+                })
+
             except ValueError:
                 return jsonify({"response": f"Please enter a number between 1 and 6 for how often you experience {SYMPTOMS[step]}."})
 
+    # 💬 Support chat fallback
     if mode == "support":
         chat_history = state.get("history", "")
         chat_prompt = (
@@ -367,7 +440,6 @@ def chat():
             "Please respond kindly, supportively, and avoid repeating the user.\n"
             f"{chat_history}User: {user_message}\nAI:"
         )
-
         try:
             response = completion(
                 model="gpt-4o-mini",
@@ -377,19 +449,23 @@ def chat():
                 ],
                 max_tokens=150
             )
-
             reply = response.choices[0].message["content"].strip()
             if not reply or len(reply) < 5:
                 reply = "I'm here for you. Would you like to talk more about how you're feeling?"
 
             full_history = f"{chat_history}User: {user_message}\nAI: {reply}\n"
             state["history"] = "\n".join(full_history.splitlines()[-10:])
-
             return jsonify({"response": reply})
 
         except Exception as e:
             print("GPT-4o-mini error:", e)
             return jsonify({"response": "Sorry, something went wrong. But I'm still here for you. Try again in a moment 💙"})
+
+    # 🛡️ Default fallback
+    return jsonify({
+        "response": "Sorry, I didn’t understand that. Please enter a number between 1 and 6 or type 'skip' to talk freely."
+    })
+
 
 def generate_depression_prediction_gpt2(prompt: str):
     inputs = tokenizer_gpt2(prompt, return_tensors="pt", truncation=True).to(DEVICE)
